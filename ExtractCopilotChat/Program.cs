@@ -33,10 +33,9 @@ Console.WriteLine($"Input : {inputDir}");
 Console.WriteLine($"Output: {outputDir}");
 Console.WriteLine();
 
-var options = new JsonSerializerOptions
+var options = new JsonDocumentOptions
 {
-	PropertyNameCaseInsensitive = true,
-	ReadCommentHandling = JsonCommentHandling.Skip,
+	CommentHandling = JsonCommentHandling.Skip,
 	AllowTrailingCommas = true
 };
 
@@ -48,7 +47,7 @@ foreach (var file in jsonFiles)
 	{
 		// Read file
 		var json = await File.ReadAllTextAsync(file);
-		using var doc = JsonDocument.Parse(json);
+		using var doc = JsonDocument.Parse(json, options);
 
 		var messages = ExtractMessages(doc.RootElement);
 
@@ -66,10 +65,11 @@ foreach (var file in jsonFiles)
 			{
 				Author = (m.Author ?? "").Trim(),
 				Text = NormalizeLineEndings((m.Text ?? "").Trim()),
-				Timestamp = NormalizeTimestamp(m.Timestamp).ToString()
+				Timestamp = NormalizeTimestamp(m.Timestamp).ToString(),
+				TimestampParsed = NormalizeTimestamp(m.Timestamp)
 			})
 			.Where(m => !string.IsNullOrWhiteSpace(m.Text))
-			.OrderBy(m => m.Timestamp ?? DateTimeOffset.MinValue.ToString())
+			.OrderBy(m => m.TimestampParsed ?? DateTimeOffset.MinValue)
 			.ToList();
 
 		// Create output
