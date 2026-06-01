@@ -12,9 +12,9 @@ These tools are intentionally pragmatic:
 > If you’re looking for curated, stable, long-term maintained tooling… this repo probably isn’t it.  
 > If you’re looking for *“I just need this done once”* helpers — welcome. 🙂
 
-## Contents
+# Contents
 
-### ✅ Extract Copilot Chat
+## ✅ Extract Copilot Chat
 
 Export Copilot chat transcripts from **JSON files saved via browser DevTools (Network tab)** into **Markdown**.
 
@@ -24,7 +24,13 @@ Copilot UIs change frequently and export options are inconsistent across account
 2.  Save the conversation JSON response(s) to disk
 3.  Convert to readable `.md` files you can archive, search, and sort yourself
 
-## Extract Copilot Chat
+## ✅ OFX to XLSX Converter
+
+Convert basic **OFX (Open Financial Exchange)** bank export files into simple **Excel (.xlsx)** spreadsheets.
+
+This is a **best-effort parser**, built for practical use with real-world bank exports — not a full spec-compliant OFX implementation.
+
+# Extract Copilot Chat
 
 ### What it does
 
@@ -94,7 +100,65 @@ Each markdown file includes:
 *   **Deduping is heuristic**: It aims to remove common duplicates but may occasionally merge distinct messages that are identical in content.
 *   **No guarantee of completeness**: If the network response didn’t include older turns, the output won’t either.
 
-## Contributing
+# OFX to XLSX Converter
+
+### What it does
+
+* Reads a single `.ofx` file
+* Extracts common transaction fields, including:
+  * Date
+  * Amount
+  * Description / Memo
+  * Transaction type (if available)
+  * Account / balance info (when present)
+* Outputs a flat `.xlsx` file for easy filtering, sorting, and analysis
+
+### Supported scenarios
+
+* Typical bank export files (checking / credit accounts)
+* OFX files that resemble:
+  * SGML-style (older OFX 1.x)
+  * Loosely structured, non-strict variants many banks produce
+
+### Not supported
+
+* Full OFX 2.x / XML compliance
+* Every possible tag or edge case
+* Investment account structures (partial at best)
+* Multi-account aggregation in a single file
+
+## How to use
+
+### Run
+
+```bash
+dotnet run --project easy-mini-tools/OFX-To-XLSX/OFX-To-XLSX-Converter
+```
+
+## Output format
+
+The generated spreadsheet includes:
+
+* One row per transaction
+* Columns for:
+  * Type
+  * Date
+  * Amount
+  * Id
+  * Check Number
+  * Name
+  * Description
+* Minimal formatting — intended for **post-processing in Excel**, not presentation
+
+## Known limitations / disclaimers
+
+* **Best-effort parsing**: OFX files are notoriously inconsistent between institutions.
+* **Loose parsing strategy**: The tool prioritizes “getting usable data out” over strict correctness.
+* **Field coverage varies**: Some banks omit fields or use non-standard tags.
+* **No validation guarantees**: Always sanity-check totals and balances against your source data.
+* **Encoding quirks**: Some OFX files include odd encoding/line break issues that may require manual cleanup.
+
+# Contributing
 
 PRs are welcome, but the spirit of this repo is **small + useful + low-maintenance**.
 
@@ -104,22 +168,27 @@ If you submit improvements, please keep them aligned with the theme:
 *   No dependency explosions
 *   Prefer “drop-in and run” simplicity
 
-## Repo structure (suggested)
+# Repo structure
 
 A simple layout that stays scalable as you add more mini-tools:
 
-    /
-      easy-mini-tools/
-        ExtractCopilotChat/
-          Program.cs
-          ExtractCopilotChat.csproj
-      README.md
-      LICENSE
+```
+/
+  easy-mini-tools/
+    ExtractCopilotChat/
+      Program.cs
+      ExtractCopilotChat.slnx
+    OFX-To-XLSX/
+      Program.cs
+      OFX-To-XLSX.sln
+  README.md
+  LICENSE
+```
 
-## Authors
+# Authors
 
 * **NF Software Inc.**
 
-## License
+# License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
